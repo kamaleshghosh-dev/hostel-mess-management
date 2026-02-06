@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hostel Mess Management</title>
+    <link rel="stylesheet" href="customerFront.css">
+</head>
+<body>
+
+    <div class="section">
+        <h2>Subscribed Kitchens</h2>
+        <div class="container" id="subscribedContainer"></div>
+    </div>
+
+    <div class="section">
+        <h2>Available Kitchens</h2>
+        <div class="container" id="unsubscribedContainer"></div>
+    </div>
+
+    <!-- Modal for Subscribe/Unsubscribe -->
+    <div class="modal" id="modal">
+        <div class="modal-content" id="modalContent">
+            <h3 id="modalTitle"></h3>
+            <button id="actionButton"></button><br>
+            <button onclick="closeModal()" style="margin-top:10px; background-color: gray;">Close</button>
+        </div>
+    </div>
+
+    <script>
+        const kitchens = ["Quines Kitchen", "Moms Kitchen", "Tasty Bites", "Healthy Meals", "Food Corner", "Spice Hub"];
+        let subscribedKitchen = null;
+        let subscriptionDate = null;
+
+        const modal = document.getElementById("modal");
+        const modalTitle = document.getElementById("modalTitle");
+        const actionButton = document.getElementById("actionButton");
+
+        function renderKitchens() {
+            const subscribedContainer = document.getElementById("subscribedContainer");
+            const unsubscribedContainer = document.getElementById("unsubscribedContainer");
+
+            subscribedContainer.innerHTML = "";
+            unsubscribedContainer.innerHTML = "";
+
+            kitchens.forEach(name => {
+                const box = document.createElement("div");
+                box.className = "kitchen-box";
+                box.textContent = name;
+                box.onclick = () => handleBoxClick(name);
+
+                if (subscribedKitchen === name) {
+                    subscribedContainer.appendChild(box);
+                } else {
+                    unsubscribedContainer.appendChild(box);
+                }
+            });
+        }
+
+        function handleBoxClick(kitchenName) {
+            modal.style.display = "flex";
+            modalTitle.textContent = kitchenName;
+
+            const now = new Date();
+            const subscribedAt = subscriptionDate ? new Date(subscriptionDate) : null;
+
+            if (subscribedKitchen === kitchenName) {
+                // Check if 2 months have passed
+                const diffInMonths = subscribedAt ? (now.getFullYear() - subscribedAt.getFullYear()) * 12 + (now.getMonth() - subscribedAt.getMonth()) : 0;
+                if (diffInMonths >= 2) {
+                    actionButton.textContent = "Unsubscribe";
+                    actionButton.onclick = () => {
+                        subscribedKitchen = null;
+                        subscriptionDate = null;
+                        closeModal();
+                        renderKitchens();
+                    };
+                } else {
+                    actionButton.textContent = "Unsubscribe (Available after 2 months)";
+                    actionButton.onclick = () => alert("You can unsubscribe only after 2 months.");
+                }
+            } else if (!subscribedKitchen) {
+                actionButton.textContent = "Subscribe";
+                actionButton.onclick = () => {
+                    subscribedKitchen = kitchenName;
+                    subscriptionDate = new Date().toISOString();
+                    closeModal();
+                    renderKitchens();
+                };
+            } else {
+                actionButton.textContent = "Already Subscribed to Another Kitchen";
+                actionButton.onclick = () => alert("You can only subscribe to one kitchen at a time.");
+            }
+        }
+
+        function closeModal() {
+            modal.style.display = "none";
+        }
+
+        renderKitchens();
+    </script>
+</body>
+</html>

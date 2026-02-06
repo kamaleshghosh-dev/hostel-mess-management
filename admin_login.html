@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Login</title>
+  <link rel="stylesheet" href="admin_login.css">
+</head>
+<body>
+
+  <div class="container">
+    <h2>Admin Login</h2>
+    <form id="adminLoginForm">
+      <div class="input-group">
+        <label for="identifier">Email or Mobile Number</label>
+        <input type="text" id="identifier" name="identifier" placeholder="Enter email or mobile number">
+      </div>
+
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter password">
+      </div>
+
+      <button type="submit">Login</button>
+      <p id="message"></p>
+
+      <!-- Sign Up link -->
+      <div class="signup-text">
+        Not registered? <a href="newProviderRegister.html">Sign Up</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("adminLoginForm").addEventListener("submit", async function(event) {
+      event.preventDefault();
+
+      let identifier = document.getElementById("identifier").value.trim();
+      let password = document.getElementById("password").value.trim();
+      let message = document.getElementById("message");
+
+      if (!identifier || !password) {
+        message.style.color = "red";
+        message.innerText = "All fields are required!";
+        return;
+      }
+
+      try {
+        const res = await fetch("http://localhost:3001/admin_login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ identifier, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          message.style.color = "green";
+          message.innerText = data.message;
+
+          // redirect to dashboard
+          setTimeout(() => {
+            window.location.href = "dashboard.html";
+          }, 1000);
+        } else {
+          message.style.color = "red";
+          message.innerText = data.message;
+        }
+      } catch (error) {
+        message.style.color = "red";
+        message.innerText = "Server error!";
+      }
+    });
+  </script>
+
+</body>
+</html>
